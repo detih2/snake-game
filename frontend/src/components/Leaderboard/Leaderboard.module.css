@@ -1,0 +1,235 @@
+/**
+ * Стили для таблицы лидеров.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* === Заголовок === */
+.header {
+  text-align: center;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+.trophy {
+  font-size: 2.5rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+/* === Контент === */
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* === Загрузка === */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+.spinner {
+  font-size: 2rem;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* === Ошибка === */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid var(--accent-danger);
+  border-radius: var(--border-radius);
+  color: var(--accent-danger);
+}
+
+/* === Пустой список === */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.emptyHint {
+  font-size: 0.875rem;
+  color: var(--accent-primary);
+}
+
+/* === Таблица === */
+.table {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 120px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 120px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tableRow.topThree {
+  background: rgba(0, 255, 136, 0.03);
+}
+
+.tableRow.topThree:hover {
+  background: rgba(0, 255, 136, 0.08);
+}
+
+/* Колонки */
+.colRank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colName {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.colScore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.colDate {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Места */
+.gold {
+  font-size: 1.5rem;
+}
+
+.silver {
+  font-size: 1.4rem;
+}
+
+.bronze {
+  font-size: 1.3rem;
+}
+
+.rankNumber {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* === Глобальная статистика === */
+.globalStats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* === Адаптивность === */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 50px 1fr 60px;
+  }
+  
+  .colDate {
+    display: none;
+  }
+}

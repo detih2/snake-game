@@ -1,0 +1,362 @@
+/**
+ * Глобальные стили приложения.
+ * 
+ * Цветовая схема: тёмная тема в стиле ретро-игр с неоновыми акцентами.
+ * Шрифты: 
+ * - Orbitron — для заголовков (футуристичный, как в аркадных играх)
+ * - JetBrains Mono — для чисел и текста (моноширинный, чёткий)
+ */
+
+/* === CSS Variables (переменные) === */
+/* Определяем цвета и размеры в одном месте — легко менять тему */
+:root {
+  /* Фоновые цвета */
+  --bg-primary: #0f0f23;
+  --bg-secondary: #1a1a2e;
+  --bg-card: #16213e;
+  
+  /* Цвета змейки */
+  --snake-head: #22c55e;
+  --snake-body: #16a34a;
+  --snake-glow: rgba(34, 197, 94, 0.5);
+  
+  /* Цвета еды */
+  --food-normal: #ef4444;
+  --food-bonus: #fbbf24;
+  --food-glow: rgba(239, 68, 68, 0.5);
+  
+  /* Акцентные цвета */
+  --accent-primary: #00ff88;
+  --accent-secondary: #00d4ff;
+  --accent-danger: #ff4757;
+  
+  /* Текст */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  
+  /* Границы */
+  --border-color: #2a2a4a;
+  --border-glow: rgba(0, 255, 136, 0.3);
+  
+  /* Размеры */
+  --cell-size: 20px;
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  
+  /* Шрифты */
+  --font-display: 'Orbitron', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  /* Тени */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px var(--accent-primary);
+}
+
+/* === Reset (сброс стандартных стилей браузера) === */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === Базовые стили === */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-mono);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  
+  /* Красивый градиентный фон */
+  background: 
+    radial-gradient(ellipse at top, #1a1a3e 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, #0a2a1a 0%, transparent 50%),
+    var(--bg-primary);
+}
+
+/* === Анимированный фон с точками === */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(0, 212, 255, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* === Контейнер приложения === */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* === Типографика === */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+/* === Кнопки === */
+button {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px 24px;
+  border: 2px solid var(--accent-primary);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 136, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+button:hover {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Вариант кнопки — опасное действие */
+button.danger {
+  border-color: var(--accent-danger);
+  color: var(--accent-danger);
+}
+
+button.danger:hover {
+  background: var(--accent-danger);
+  color: var(--text-primary);
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+}
+
+/* Вариант кнопки — вторичная */
+button.secondary {
+  border-color: var(--text-muted);
+  color: var(--text-secondary);
+}
+
+button.secondary:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+/* === Карточки === */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+/* === Анимации === */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--accent-primary);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--accent-primary), 0 0 30px var(--accent-primary);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* === Вспомогательные классы === */
+.text-center {
+  text-align: center;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.animate-glow {
+  animation: glow 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* === Скроллбар (для таблицы лидеров) === */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* === Медиа-запросы (адаптивность) === */
+@media (max-width: 768px) {
+  :root {
+    --cell-size: 15px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --cell-size: 12px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  #root {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,184 @@
+/**
+ * Стили для главного меню.
+ */
+
+.menuContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 40px;
+  max-width: 500px;
+  text-align: center;
+}
+
+/* === Заголовок === */
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.snakeIcon {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.5));
+}
+
+.title {
+  display: flex;
+  gap: 4px;
+  font-size: 3.5rem;
+  margin: 0;
+}
+
+.letter {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* === Рекорд === */
+.highScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.highScoreLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.highScoreValue {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--food-bonus);
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* === Кнопки === */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.playButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 32px;
+  font-size: 1.25rem;
+  background: linear-gradient(135deg, var(--accent-primary), #00cc6f);
+  border: none;
+  color: var(--bg-primary);
+}
+
+.playButton:hover {
+  background: linear-gradient(135deg, #00ff99, var(--accent-primary));
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+}
+
+.playIcon {
+  font-size: 1rem;
+}
+
+.secondaryButton {
+  font-size: 0.9rem;
+}
+
+/* === Управление === */
+.controls {
+  padding: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  width: 100%;
+}
+
+.controlsTitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.controlItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlKey {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+}
+
+.controlLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* === Подсказка === */
+.hint {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* === Адаптивность === */
+@media (max-width: 480px) {
+  .menuContainer {
+    padding: 20px;
+    gap: 24px;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .snakeIcon {
+    font-size: 3rem;
+  }
+  
+  .controlsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

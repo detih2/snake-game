@@ -1,0 +1,186 @@
+/**
+ * Стили для экрана Game Over.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px;
+  max-width: 450px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-danger);
+  border-radius: var(--border-radius);
+  box-shadow: 
+    var(--shadow-lg),
+    0 0 40px rgba(255, 71, 87, 0.2);
+}
+
+/* === Заголовок === */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: var(--accent-danger);
+  text-shadow: 
+    0 0 10px var(--accent-danger),
+    0 0 20px var(--accent-danger);
+  animation: shake 0.5s ease-in-out;
+}
+
+.skull {
+  font-size: 3rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+/* === Счёт === */
+.scoreContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 40px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.scoreLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.scoreValue {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.newRecord {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--food-bonus);
+  text-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* === Статистика === */
+.stats {
+  width: 100%;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.statsTitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.statIcon {
+  font-size: 1.5rem;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* === Кнопки === */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.playAgainButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--accent-primary), #00cc6f);
+  border: none;
+  color: var(--bg-primary);
+}
+
+.playAgainButton:hover {
+  background: linear-gradient(135deg, #00ff99, var(--accent-primary));
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
+}
+
+/* === Статус сохранения === */
+.saveStatus {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-height: 20px;
+}
+
+.saved {
+  color: var(--accent-primary);
+}
+
+/* === Подсказка === */
+.hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* === Адаптивность === */
+@media (max-width: 480px) {
+  .container {
+    padding: 24px;
+    gap: 20px;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .scoreValue {
+    font-size: 3rem;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
