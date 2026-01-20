@@ -1,8 +1,7 @@
 """
 API роутер для таблицы лидеров.
 
-Таблица лидеров показывает лучших игроков по набранным очкам.
-Это мотивирует играть снова и улучшать свой результат!
+Таблица лидеров показывает 10 лучших результатов за все время.
 """
 
 from fastapi import APIRouter, Depends
@@ -28,7 +27,7 @@ router = APIRouter(
     "",
     response_model=LeaderboardResponse,
     summary="Получить таблицу лидеров",
-    description="Возвращает TOP-N игроков по лучшему результату.",
+    description="Возвращает TOP-10 лучших результатов за всё время.",
 )
 async def get_leaderboard(
     limit: int = None,
@@ -37,14 +36,8 @@ async def get_leaderboard(
     """
     Получить таблицу лидеров.
     
-    Возвращает список лучших результатов.
-    Если один игрок имеет несколько игр — показываем только лучший результат.
-    
-    Алгоритм:
-    1. Группируем по имени игрока
-    2. Берём максимальный score для каждого игрока
-    3. Сортируем по убыванию score
-    4. Ограничиваем количество записей
+    Возвращает TOP-N лучших результатов за всё время (без группировки по игроку).
+    Один игрок может появляться несколько раз если у него несколько хороших игр.
     
     Args:
         limit: Количество записей (по умолчанию из настроек)
@@ -60,26 +53,9 @@ async def get_leaderboard(
     # Ограничиваем максимальное значение
     limit = min(limit, 100)
     
-    # === Подзапрос: лучший результат каждого игрока ===
-    # Это как "для каждого игрока найди его лучшую игру"
-    subquery = (
-        select(
-            GameResult.player_name,
-            func.max(GameResult.score).label("best_score"),
-        )
-        .group_by(GameResult.player_name)
-        .subquery()
-    )
-    
-    # === Основной запрос: детали лучших игр ===
-    # Присоединяем подзапрос чтобы получить полную информацию об игре
+    # Просто берём TOP-N по очкам (без группировки)
     query = (
         select(GameResult)
-        .join(
-            subquery,
-            (GameResult.player_name == subquery.c.player_name) &
-            (GameResult.score == subquery.c.best_score)
-        )
         .order_by(GameResult.score.desc())
         .limit(limit)
     )
@@ -90,7 +66,7 @@ async def get_leaderboard(
     # Формируем записи таблицы лидеров с рангом (местом)
     entries = [
         LeaderboardEntry(
-            rank=idx + 1,  # Место: 1, 2, 3...
+            rank=idx + 1,
             player_name=game.player_name,
             score=game.score,
             played_at=game.played_at,
@@ -128,13 +104,6 @@ async def get_player_position(
 ) -> dict:
     """
     Узнать позицию игрока в таблице лидеров.
-    
-    Args:
-        player_name: Имя игрока
-        session: Сессия базы данных
-    
-    Returns:
-        Позиция и лучший результат игрока
     """
     # Находим лучший результат игрока
     best_score_query = (
@@ -152,13 +121,12 @@ async def get_player_position(
             "message": "Игрок ещё не играл",
         }
     
-    # Считаем сколько игроков имеют результат лучше
-    # Позиция = количество игроков с лучшим результатом + 1
-    better_players_query = (
-        select(func.count(distinct(GameResult.player_name)))
+    # Считаем сколько результатов лучше
+    better_results_query = (
+        select(func.count(GameResult.id))
         .where(GameResult.score > best_score)
     )
-    better_result = await session.execute(better_players_query)
+    better_result = await session.execute(better_results_query)
     better_count = better_result.scalar() or 0
     
     position = better_count + 1

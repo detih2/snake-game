@@ -1,0 +1,18 @@
+# Render Blueprint — конфигурация для автоматического деплоя
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Backend API (FastAPI + SQLite)
+  - type: web
+    name: snake-game-api
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: DEBUG
+        value: "false"

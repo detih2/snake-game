@@ -1,36 +1,23 @@
 /**
  * useGame — кастомный хук с логикой игры "Змейка".
- * 
- * Что такое хук (Hook)?
- * --------------------
- * Хук — это функция, которая позволяет использовать состояние и другие
- * возможности React без написания классов. Хуки начинаются с "use".
- * 
- * Почему выносим логику в отдельный хук?
- * -------------------------------------
- * 1. Разделение ответственности (логика отдельно от отображения)
- * 2. Можно использовать в разных компонентах
- * 3. Легче тестировать
- * 4. Код компонента становится чище
- * 
- * Как работает игра:
- * -----------------
- * 1. Игровое поле — это сетка ячеек (например 20x20)
- * 2. Змейка — массив координат [{x, y}, {x, y}, ...]
- * 3. Каждый "тик" (например 100ms) змейка двигается на одну ячейку
- * 4. Если голова змейки попадает на еду — она растёт
- * 5. Если голова касается стены или тела — Game Over
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 // === Константы игры ===
-const GRID_SIZE = 20;        // Размер поля 20x20
-const INITIAL_SPEED = 150;   // Начальная скорость (ms между тиками)
-const MIN_SPEED = 50;        // Максимальная скорость (минимальная задержка)
-const SPEED_INCREMENT = 5;   // На сколько ускоряемся за каждые 5 очков
-const BONUS_DURATION = 5000; // Бонус исчезает через 5 секунд
-const BONUS_CHANCE = 0.15;   // 15% шанс появления бонуса вместо обычной еды
+const GRID_SIZE = 20;
+const INITIAL_SPEED = 150;
+const MIN_SPEED = 50;
+const SPEED_INCREMENT = 5;
+const BONUS_SOLID_DURATION = 5000;    // Фаза 1: 5 сек (5 очков)
+const BONUS_BLINKING_DURATION = 5000; // Фаза 2: 5 сек (3 очка)
+const BONUS_CHANCE = 0.15;
+
+// Фазы бонуса
+export const BONUS_PHASE = {
+  SOLID: 'solid',
+  BLINKING: 'blinking',
+};
 
 // Направления движения
 const DIRECTIONS = {
@@ -42,24 +29,30 @@ const DIRECTIONS = {
 
 // Статусы игры
 export const GAME_STATUS = {
-  IDLE: 'idle',         // Начальный экран (меню)
-  PLAYING: 'playing',   // Игра идёт
-  PAUSED: 'paused',     // Пауза
-  GAME_OVER: 'gameOver', // Игра окончена
+  IDLE: 'idle',
+  PLAYING: 'playing',
+  PAUSED: 'paused',
+  GAME_OVER: 'gameOver',
 };
 
 /**
  * Генерирует случайную позицию на поле.
- * Проверяет что позиция не занята змейкой.
  */
-function getRandomPosition(snake) {
+function getRandomPosition(snake, food = null, bonus = null) {
   let position;
+  let attempts = 0;
   do {
     position = {
       x: Math.floor(Math.random() * GRID_SIZE),
       y: Math.floor(Math.random() * GRID_SIZE),
     };
-  } while (snake.some(segment => segment.x === position.x && segment.y === position.y));
+    attempts++;
+    if (attempts > 1000) break;
+  } while (
+    snake.some(segment => segment.x === position.x && segment.y === position.y) ||
+    (food && food.x === position.x && food.y === position.y) ||
+    (bonus && bonus.x === position.x && bonus.y === position.y)
+  );
   return position;
 }
 
@@ -70,9 +63,9 @@ function createInitialSnake() {
   const centerX = Math.floor(GRID_SIZE / 2);
   const centerY = Math.floor(GRID_SIZE / 2);
   return [
-    { x: centerX, y: centerY },     // Голова
-    { x: centerX - 1, y: centerY }, // Тело
-    { x: centerX - 2, y: centerY }, // Хвост
+    { x: centerX, y: centerY },
+    { x: centerX - 1, y: centerY },
+    { x: centerX - 2, y: centerY },
   ];
 }
 
@@ -88,12 +81,10 @@ export function useGame() {
   const [direction, setDirection] = useState(DIRECTIONS.RIGHT);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    // Загружаем лучший результат из localStorage
     const saved = localStorage.getItem('snakeHighScore');
     return saved ? parseInt(saved, 10) : 0;
   });
   
-  // Статистика текущей игры
   const [stats, setStats] = useState({
     foodEaten: 0,
     bonusesEaten: 0,
@@ -101,36 +92,60 @@ export function useGame() {
     startTime: null,
   });
   
-  // Refs для хранения значений, которые не должны вызывать ре-рендер
+  // Refs для значений которые нужны в gameStep без ре-рендера
   const directionRef = useRef(direction);
   const gameLoopRef = useRef(null);
-  const bonusTimeoutRef = useRef(null);
+  const bonusTimerRef = useRef(null);
+  const growthRef = useRef(0);
   
-  // Обновляем ref при изменении direction
+  // Ref для актуальных значений food и bonus (чтобы избежать stale closure)
+  const gameStateRef = useRef({ food: null, bonus: null });
+  
+  // Синхронизируем refs
   useEffect(() => {
     directionRef.current = direction;
   }, [direction]);
   
+  useEffect(() => {
+    gameStateRef.current.food = food;
+  }, [food]);
+  
+  useEffect(() => {
+    gameStateRef.current.bonus = bonus;
+  }, [bonus]);
+  
   // === Вычисляемая скорость ===
-  // Чем больше очков — тем быстрее игра
   const speed = Math.max(
     MIN_SPEED,
     INITIAL_SPEED - Math.floor(score / 5) * SPEED_INCREMENT
   );
   
-  // === Функции управления игрой ===
+  /**
+   * Очистить таймер бонуса.
+   */
+  const clearBonusTimer = useCallback(() => {
+    if (bonusTimerRef.current) {
+      clearTimeout(bonusTimerRef.current);
+      bonusTimerRef.current = null;
+    }
+  }, []);
   
   /**
    * Начать новую игру.
    */
   const startGame = useCallback(() => {
-    // Сбрасываем всё в начальное состояние
     const newSnake = createInitialSnake();
+    const newFood = getRandomPosition(newSnake);
+    
+    clearBonusTimer();
+    
     setSnake(newSnake);
-    setFood(getRandomPosition(newSnake));
+    setFood(newFood);
     setBonus(null);
     setDirection(DIRECTIONS.RIGHT);
     directionRef.current = DIRECTIONS.RIGHT;
+    gameStateRef.current = { food: newFood, bonus: null };
+    growthRef.current = 0;
     setScore(0);
     setStats({
       foodEaten: 0,
@@ -139,15 +154,10 @@ export function useGame() {
       startTime: Date.now(),
     });
     setStatus(GAME_STATUS.PLAYING);
-    
-    // Очищаем таймер бонуса если был
-    if (bonusTimeoutRef.current) {
-      clearTimeout(bonusTimeoutRef.current);
-    }
-  }, []);
+  }, [clearBonusTimer]);
   
   /**
-   * Поставить игру на паузу / снять с паузы.
+   * Поставить игру на паузу.
    */
   const togglePause = useCallback(() => {
     if (status === GAME_STATUS.PLAYING) {
@@ -162,23 +172,19 @@ export function useGame() {
    */
   const goToMenu = useCallback(() => {
     setStatus(GAME_STATUS.IDLE);
+    clearBonusTimer();
     if (gameLoopRef.current) {
       clearInterval(gameLoopRef.current);
+      gameLoopRef.current = null;
     }
-    if (bonusTimeoutRef.current) {
-      clearTimeout(bonusTimeoutRef.current);
-    }
-  }, []);
+  }, [clearBonusTimer]);
   
   /**
    * Изменить направление движения.
-   * Проверяет что нельзя развернуться на 180°.
    */
   const changeDirection = useCallback((newDirection) => {
     const current = directionRef.current;
     
-    // Нельзя развернуться на 180°
-    // Например, если едем вправо — нельзя сразу влево
     const isOpposite = (
       (current === DIRECTIONS.UP && newDirection === DIRECTIONS.DOWN) ||
       (current === DIRECTIONS.DOWN && newDirection === DIRECTIONS.UP) ||
@@ -188,28 +194,52 @@ export function useGame() {
     
     if (!isOpposite) {
       setDirection(newDirection);
+      directionRef.current = newDirection;
     }
   }, []);
   
   /**
-   * Создать бонусную еду.
+   * Создать бонус.
    */
-  const spawnBonus = useCallback((currentSnake) => {
-    const bonusPosition = getRandomPosition(currentSnake);
-    setBonus(bonusPosition);
+  const spawnBonus = useCallback((snakePos, foodPos) => {
+    clearBonusTimer();
     
-    // Бонус исчезает через BONUS_DURATION
-    bonusTimeoutRef.current = setTimeout(() => {
-      setBonus(null);
-    }, BONUS_DURATION);
-  }, []);
+    const bonusPosition = getRandomPosition(snakePos, foodPos);
+    const newBonus = {
+      x: bonusPosition.x,
+      y: bonusPosition.y,
+      phase: BONUS_PHASE.SOLID,
+      id: Date.now(), // Уникальный ID для React key
+    };
+    
+    gameStateRef.current.bonus = newBonus;
+    setBonus(newBonus);
+    
+    // Таймер: через 5 сек переходим в BLINKING
+    bonusTimerRef.current = setTimeout(() => {
+      setBonus(prev => {
+        if (prev && prev.id === newBonus.id) {
+          const blinking = { ...prev, phase: BONUS_PHASE.BLINKING };
+          gameStateRef.current.bonus = blinking;
+          
+          // Ещё через 5 сек удаляем
+          bonusTimerRef.current = setTimeout(() => {
+            gameStateRef.current.bonus = null;
+            setBonus(null);
+          }, BONUS_BLINKING_DURATION);
+          
+          return blinking;
+        }
+        return prev;
+      });
+    }, BONUS_SOLID_DURATION);
+  }, [clearBonusTimer]);
   
   /**
-   * Один "тик" игры — движение змейки.
+   * Один "тик" игры.
    */
   const gameStep = useCallback(() => {
     setSnake((currentSnake) => {
-      // Вычисляем новую позицию головы
       const head = currentSnake[0];
       const dir = directionRef.current;
       const newHead = {
@@ -217,9 +247,7 @@ export function useGame() {
         y: head.y + dir.y,
       };
       
-      // === Проверка столкновений ===
-      
-      // 1. Столкновение со стеной
+      // Столкновение со стеной
       if (
         newHead.x < 0 ||
         newHead.x >= GRID_SIZE ||
@@ -230,79 +258,78 @@ export function useGame() {
         return currentSnake;
       }
       
-      // 2. Столкновение с собой
-      if (currentSnake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+      // Столкновение с собой
+      const bodyToCheck = growthRef.current > 0 ? currentSnake : currentSnake.slice(0, -1);
+      if (bodyToCheck.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
         setStatus(GAME_STATUS.GAME_OVER);
         return currentSnake;
       }
       
-      // === Движение ===
-      // Создаём новую змейку: новая голова + старое тело (без хвоста)
-      const newSnake = [newHead, ...currentSnake.slice(0, -1)];
+      // Движение змейки
+      let newSnake;
+      if (growthRef.current > 0) {
+        newSnake = [newHead, ...currentSnake];
+        growthRef.current--;
+      } else {
+        newSnake = [newHead, ...currentSnake.slice(0, -1)];
+      }
       
-      // === Проверка поедания еды ===
-      setFood((currentFood) => {
-        if (currentFood && newHead.x === currentFood.x && newHead.y === currentFood.y) {
-          // Съели обычную еду!
-          setScore((s) => s + 1);
-          setStats((st) => ({
-            ...st,
-            foodEaten: st.foodEaten + 1,
-            maxLength: Math.max(st.maxLength, newSnake.length + 1),
-          }));
-          
-          // Добавляем хвост обратно (змейка растёт)
-          newSnake.push(currentSnake[currentSnake.length - 1]);
-          
-          // С шансом BONUS_CHANCE появляется бонус
-          if (Math.random() < BONUS_CHANCE && !bonus) {
-            spawnBonus(newSnake);
-          }
-          
-          // Генерируем новую еду
-          return getRandomPosition(newSnake);
+      // Проверяем еду
+      const currentFood = gameStateRef.current.food;
+      if (currentFood && newHead.x === currentFood.x && newHead.y === currentFood.y) {
+        growthRef.current += 1;
+        setScore(s => s + 1);
+        setStats(st => ({
+          ...st,
+          foodEaten: st.foodEaten + 1,
+          maxLength: Math.max(st.maxLength, newSnake.length + growthRef.current),
+        }));
+        
+        const currentBonus = gameStateRef.current.bonus;
+        const newFood = getRandomPosition(newSnake, null, currentBonus);
+        gameStateRef.current.food = newFood;
+        setFood(newFood);
+        
+        // Шанс спавна бонуса
+        if (Math.random() < BONUS_CHANCE && !currentBonus) {
+          spawnBonus(newSnake, newFood);
         }
-        return currentFood;
-      });
+      }
       
-      // === Проверка поедания бонуса ===
-      setBonus((currentBonus) => {
-        if (currentBonus && newHead.x === currentBonus.x && newHead.y === currentBonus.y) {
-          // Съели бонус!
-          setScore((s) => s + 3);
-          setStats((st) => ({
-            ...st,
-            bonusesEaten: st.bonusesEaten + 1,
-            maxLength: Math.max(st.maxLength, newSnake.length + 3),
-          }));
-          
-          // Змейка растёт на 3 сегмента
-          for (let i = 0; i < 3; i++) {
-            newSnake.push(currentSnake[currentSnake.length - 1]);
-          }
-          
-          // Очищаем таймер бонуса
-          if (bonusTimeoutRef.current) {
-            clearTimeout(bonusTimeoutRef.current);
-          }
-          
-          return null;
-        }
-        return currentBonus;
-      });
+      // Проверяем бонус
+      const currentBonus = gameStateRef.current.bonus;
+      if (currentBonus && newHead.x === currentBonus.x && newHead.y === currentBonus.y) {
+        // Определяем очки по фазе
+        const points = currentBonus.phase === BONUS_PHASE.SOLID ? 5 : 3;
+        
+        growthRef.current += points;
+        setScore(s => s + points);
+        setStats(st => ({
+          ...st,
+          bonusesEaten: st.bonusesEaten + 1,
+          maxLength: Math.max(st.maxLength, newSnake.length + growthRef.current),
+        }));
+        
+        // Удаляем бонус СРАЗУ
+        clearBonusTimer();
+        gameStateRef.current.bonus = null;
+        setBonus(null);
+      }
       
       return newSnake;
     });
-  }, [bonus, spawnBonus]);
+  }, [spawnBonus, clearBonusTimer]);
   
   // === Игровой цикл ===
   useEffect(() => {
     if (status === GAME_STATUS.PLAYING) {
-      // Запускаем интервал
       gameLoopRef.current = setInterval(gameStep, speed);
       
       return () => {
-        clearInterval(gameLoopRef.current);
+        if (gameLoopRef.current) {
+          clearInterval(gameLoopRef.current);
+          gameLoopRef.current = null;
+        }
       };
     }
   }, [status, speed, gameStep]);
@@ -310,9 +337,7 @@ export function useGame() {
   // === Обработка клавиатуры ===
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Управление только во время игры или паузы
       if (status !== GAME_STATUS.PLAYING && status !== GAME_STATUS.PAUSED) {
-        // Enter на экране меню или Game Over — начать игру
         if (e.key === 'Enter') {
           startGame();
         }
@@ -368,9 +393,7 @@ export function useGame() {
     }
   }, [score, highScore]);
   
-  // === Возвращаем состояние и функции ===
   return {
-    // Состояние
     status,
     snake,
     food,
@@ -381,15 +404,12 @@ export function useGame() {
     gridSize: GRID_SIZE,
     stats,
     direction,
-    
-    // Функции
     startGame,
     togglePause,
     goToMenu,
     changeDirection,
-    
-    // Константы для отображения
     DIRECTIONS,
+    BONUS_PHASE,
   };
 }
 

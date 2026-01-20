@@ -1,0 +1,85 @@
+/**
+ * Стили для мобильного управления.
+ * Показываются только на мобильных устройствах!
+ */
+
+.container {
+  display: none; /* Скрыто по умолчанию на десктопе */
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Показываем только на мобильных устройствах */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .container {
+    display: flex;
+  }
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.button {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 16px;
+  color: #00ff88;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.button:active {
+  transform: scale(0.95);
+  background: linear-gradient(145deg, #16213e, #1a1a2e);
+  border-color: #00ff88;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+.pauseButton {
+  width: 56px;
+  height: 56px;
+  font-size: 1.2rem;
+  background: linear-gradient(145deg, #2a2a3e, #1e1e32);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pauseButton:active {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* Увеличиваем кнопки на маленьких экранах */
+@media (max-width: 400px) {
+  .button {
+    width: 56px;
+    height: 56px;
+    font-size: 1.3rem;
+  }
+  
+  .pauseButton {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+}

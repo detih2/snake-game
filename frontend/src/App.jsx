@@ -4,13 +4,8 @@
  * Отвечает за:
  * - Управление состоянием игры (меню, игра, game over)
  * - Переключение между экранами
+ * - Хранение имени игрока
  * - Интеграцию с backend API
- * 
- * Структура экранов:
- * - IDLE: Главное меню
- * - PLAYING/PAUSED: Игровой процесс
- * - GAME_OVER: Экран окончания игры
- * - LEADERBOARD: Таблица лидеров (дополнительный экран)
  */
 
 import { useState, useCallback } from 'react';
@@ -25,8 +20,9 @@ import Menu from './components/Menu';
 import Game from './components/Game';
 import GameOver from './components/GameOver';
 import Leaderboard from './components/Leaderboard';
+import PlayerNameInput from './components/PlayerNameInput';
 
-// Дополнительные экраны (не относятся к GAME_STATUS)
+// Дополнительные экраны
 const SCREENS = {
   GAME: 'game',
   LEADERBOARD: 'leaderboard',
@@ -36,8 +32,16 @@ const SCREENS = {
  * Главный компонент приложения.
  */
 function App() {
-  // Состояние текущего экрана (для таблицы лидеров)
+  // Состояние текущего экрана
   const [screen, setScreen] = useState(SCREENS.GAME);
+  
+  // Показывать ли окно ввода имени
+  const [showNameInput, setShowNameInput] = useState(false);
+  
+  // Имя игрока (загружаем из localStorage)
+  const [playerName, setPlayerName] = useState(() => {
+    return localStorage.getItem('snakePlayerName') || 'Player';
+  });
   
   // Хук игровой логики
   const {
@@ -52,6 +56,7 @@ function App() {
     startGame,
     togglePause,
     goToMenu,
+    changeDirection,
   } = useGame();
   
   // Хук таблицы лидеров
@@ -73,16 +78,40 @@ function App() {
   }, []);
   
   /**
-   * Вернуться к игре (из таблицы лидеров).
+   * Вернуться к игре.
    */
   const backToGame = useCallback(() => {
     setScreen(SCREENS.GAME);
   }, []);
   
   /**
-   * Начать игру (из меню или после Game Over).
+   * Показать окно ввода имени перед игрой.
    */
-  const handleStartGame = useCallback(() => {
+  const handlePlayClick = useCallback(() => {
+    setShowNameInput(true);
+  }, []);
+  
+  /**
+   * Начать игру после ввода имени.
+   */
+  const handleNameSubmit = useCallback((name) => {
+    setPlayerName(name);
+    setShowNameInput(false);
+    setScreen(SCREENS.GAME);
+    startGame();
+  }, [startGame]);
+  
+  /**
+   * Отмена ввода имени.
+   */
+  const handleNameCancel = useCallback(() => {
+    setShowNameInput(false);
+  }, []);
+  
+  /**
+   * Начать игру заново (после Game Over) — без ввода имени.
+   */
+  const handlePlayAgain = useCallback(() => {
     setScreen(SCREENS.GAME);
     startGame();
   }, [startGame]);
@@ -99,8 +128,11 @@ function App() {
    * Сохранить результат игры.
    */
   const handleSaveResult = useCallback(async (gameResult) => {
-    return await saveResult(gameResult);
-  }, [saveResult]);
+    return await saveResult({
+      ...gameResult,
+      playerName: playerName,
+    });
+  }, [saveResult, playerName]);
   
   // === Рендеринг ===
   
@@ -119,45 +151,62 @@ function App() {
   
   // Основные экраны игры
   return (
-    <AnimatePresence mode="wait">
-      {/* Главное меню */}
-      {status === GAME_STATUS.IDLE && (
-        <Menu
-          key="menu"
-          onStartGame={handleStartGame}
-          onShowLeaderboard={showLeaderboard}
-          highScore={highScore}
-        />
-      )}
+    <>
+      <AnimatePresence mode="wait">
+        {/* Главное меню */}
+        {status === GAME_STATUS.IDLE && (
+          <Menu
+            key="menu"
+            onStartGame={handlePlayClick}
+            onShowLeaderboard={showLeaderboard}
+            highScore={highScore}
+            playerName={playerName}
+          />
+        )}
+        
+        {/* Игра (включая паузу) */}
+        {(status === GAME_STATUS.PLAYING || status === GAME_STATUS.PAUSED) && (
+          <Game
+            key="game"
+            snake={snake}
+            food={food}
+            bonus={bonus}
+            score={score}
+            highScore={highScore}
+            status={status}
+            gridSize={gridSize}
+            onPause={togglePause}
+            onChangeDirection={changeDirection}
+            playerName={playerName}
+          />
+        )}
+        
+        {/* Game Over */}
+        {status === GAME_STATUS.GAME_OVER && (
+          <GameOver
+            key="gameover"
+            score={score}
+            highScore={highScore}
+            stats={stats}
+            playerName={playerName}
+            onPlayAgain={handlePlayAgain}
+            onGoToMenu={handleGoToMenu}
+            onSaveResult={handleSaveResult}
+          />
+        )}
+      </AnimatePresence>
       
-      {/* Игра (включая паузу) */}
-      {(status === GAME_STATUS.PLAYING || status === GAME_STATUS.PAUSED) && (
-        <Game
-          key="game"
-          snake={snake}
-          food={food}
-          bonus={bonus}
-          score={score}
-          highScore={highScore}
-          status={status}
-          gridSize={gridSize}
-          onPause={togglePause}
-        />
-      )}
-      
-      {/* Game Over */}
-      {status === GAME_STATUS.GAME_OVER && (
-        <GameOver
-          key="gameover"
-          score={score}
-          highScore={highScore}
-          stats={stats}
-          onPlayAgain={handleStartGame}
-          onGoToMenu={handleGoToMenu}
-          onSaveResult={handleSaveResult}
-        />
-      )}
-    </AnimatePresence>
+      {/* Модальное окно ввода имени */}
+      <AnimatePresence>
+        {showNameInput && (
+          <PlayerNameInput
+            key="name-input"
+            onSubmit={handleNameSubmit}
+            onCancel={handleNameCancel}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

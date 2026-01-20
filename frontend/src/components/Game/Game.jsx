@@ -3,16 +3,28 @@
  * 
  * Отображает:
  * - Сетку игрового поля
- * - Змейку (голова + тело)
+ * - Змейку (голова + тело с буквами)
  * - Еду (обычную и бонусную)
  * - Счёт и рекорд
- * - Информацию о паузе
+ * - Мобильное управление (на тачскринах)
  */
 
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GAME_STATUS } from '../../hooks/useGame';
+import { GAME_STATUS, BONUS_PHASE } from '../../hooks/useGame';
+import MobileControls from '../MobileControls';
 import styles from './Game.module.css';
+
+// Секретная фраза, которая появляется на теле змейки
+const SECRET_PHRASE = "Тихомиров-гений, самый классный и любимый!";
+
+// Направления для мобильного управления
+const DIRECTIONS = {
+  UP: { x: 0, y: -1 },
+  DOWN: { x: 0, y: 1 },
+  LEFT: { x: -1, y: 0 },
+  RIGHT: { x: 1, y: 0 },
+};
 
 /**
  * Компонент игрового поля.
@@ -26,8 +38,20 @@ function Game({
   status, 
   gridSize,
   onPause,
+  onChangeDirection,
+  playerName,
 }) {
   const isPaused = status === GAME_STATUS.PAUSED;
+  
+  // Определяем фазу бонуса для стилей
+  const bonusPhase = bonus?.phase || BONUS_PHASE.SOLID;
+  const isBlinking = bonusPhase === BONUS_PHASE.BLINKING;
+  
+  // Обработчики для мобильного управления
+  const handleUp = useCallback(() => onChangeDirection(DIRECTIONS.UP), [onChangeDirection]);
+  const handleDown = useCallback(() => onChangeDirection(DIRECTIONS.DOWN), [onChangeDirection]);
+  const handleLeft = useCallback(() => onChangeDirection(DIRECTIONS.LEFT), [onChangeDirection]);
+  const handleRight = useCallback(() => onChangeDirection(DIRECTIONS.RIGHT), [onChangeDirection]);
   
   return (
     <div className={styles.gameContainer}>
@@ -58,6 +82,13 @@ function Game({
         </button>
       </div>
       
+      {/* Имя игрока */}
+      {playerName && (
+        <div className={styles.playerName}>
+          🎮 {playerName}
+        </div>
+      )}
+      
       {/* Игровое поле */}
       <div 
         className={styles.gameBoard}
@@ -78,6 +109,11 @@ function Game({
         <AnimatePresence>
           {snake.map((segment, index) => {
             const isHead = index === 0;
+            const letterIndex = index - 1;
+            const letter = !isHead && letterIndex < SECRET_PHRASE.length 
+              ? SECRET_PHRASE[letterIndex] 
+              : null;
+            
             return (
               <motion.div
                 key={`snake-${index}`}
@@ -90,12 +126,14 @@ function Game({
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.1 }}
               >
-                {isHead && (
+                {isHead ? (
                   <div className={styles.snakeEyes}>
                     <div className={styles.eye} />
                     <div className={styles.eye} />
                   </div>
-                )}
+                ) : letter ? (
+                  <span className={styles.snakeLetter}>{letter}</span>
+                ) : null}
               </motion.div>
             );
           })}
@@ -121,31 +159,22 @@ function Game({
           </motion.div>
         )}
         
-        {/* Бонусная еда */}
-        <AnimatePresence>
-          {bonus && (
-            <motion.div
-              className={styles.bonus}
-              style={{
-                gridColumn: bonus.x + 1,
-                gridRow: bonus.y + 1,
-              }}
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ 
-                scale: [1, 1.2, 1],
-                rotate: 0,
-              }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ 
-                duration: 0.5,
-                repeat: Infinity,
-                repeatDelay: 0.3,
-              }}
-            >
-              ⭐
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Бонусная еда с фазами */}
+        {bonus && (
+          <div
+            key={`bonus-${bonus.id}`}
+            className={`${styles.bonus} ${isBlinking ? styles.bonusBlinking : ''}`}
+            style={{
+              gridColumn: bonus.x + 1,
+              gridRow: bonus.y + 1,
+            }}
+          >
+            ⭐
+            <span className={styles.bonusPoints}>
+              +{isBlinking ? 3 : 5}
+            </span>
+          </div>
+        )}
         
         {/* Оверлей паузы */}
         <AnimatePresence>
@@ -159,21 +188,29 @@ function Game({
               <div className={styles.pauseContent}>
                 <span className={styles.pauseIcon}>⏸</span>
                 <span className={styles.pauseText}>ПАУЗА</span>
-                <span className={styles.pauseHint}>Нажмите Пробел для продолжения</span>
+                <span className={styles.pauseHint}>Нажмите Пробел или кнопку ⏸</span>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
       
-      {/* Подсказки управления */}
+      {/* Подсказки управления — скрыты на мобильных */}
       <div className={styles.controls}>
         <span>↑↓←→ или WASD — движение</span>
         <span>Пробел — пауза</span>
       </div>
+      
+      {/* Мобильное управление — показывается только на тачскринах */}
+      <MobileControls
+        onUp={handleUp}
+        onDown={handleDown}
+        onLeft={handleLeft}
+        onRight={handleRight}
+        onPause={onPause}
+      />
     </div>
   );
 }
 
-// memo — оптимизация, компонент перерисовывается только при изменении props
 export default memo(Game);

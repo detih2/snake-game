@@ -1,15 +1,8 @@
 /**
  * GameOver — компонент экрана окончания игры.
- * 
- * Отображает:
- * - Анимацию "Game Over"
- * - Набранный счёт
- * - Новый рекорд (если побит)
- * - Статистику игры
- * - Кнопки "Играть снова" и "В меню"
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import styles from './GameOver.module.css';
 
@@ -37,10 +30,14 @@ function GameOver({
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   
-  // Вычисляем длительность игры
-  const duration = stats.startTime 
-    ? (Date.now() - stats.startTime) / 1000 
-    : 0;
+  // Ref чтобы предотвратить повторное сохранение (StrictMode вызывает useEffect дважды)
+  const saveAttemptedRef = useRef(false);
+  
+  // Вычисляем длительность игры ОДИН раз при монтировании
+  const durationRef = useRef(
+    stats.startTime ? (Date.now() - stats.startTime) / 1000 : 0
+  );
+  const duration = durationRef.current;
   
   // Проверяем новый рекорд
   useEffect(() => {
@@ -49,10 +46,12 @@ function GameOver({
     }
   }, [score, highScore]);
   
-  // Сохраняем результат при монтировании
+  // Сохраняем результат при монтировании (только один раз!)
   useEffect(() => {
     const saveResult = async () => {
-      if (saved || isSaving) return;
+      // Проверяем что ещё не пытались сохранить
+      if (saveAttemptedRef.current) return;
+      saveAttemptedRef.current = true;
       
       setIsSaving(true);
       try {
@@ -72,7 +71,7 @@ function GameOver({
     };
     
     saveResult();
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [score, duration, stats.maxLength, stats.foodEaten, stats.bonusesEaten, onSaveResult]);
   
   return (
     <motion.div 

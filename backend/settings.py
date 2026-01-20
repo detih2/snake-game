@@ -84,9 +84,15 @@ class Settings(BaseSettings):
     
     # Разрешённые источники для CORS
     # CORS = Cross-Origin Resource Sharing
-    # Это нужно чтобы frontend (localhost:5173) мог обращаться к backend (localhost:8000)
+    # Это нужно чтобы frontend мог обращаться к backend
     cors_origins: list[str] = Field(
-        default=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
+        default=[
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "https://dist-lime-mu.vercel.app",
+            "https://*.vercel.app",
+        ],
         description="Разрешённые origins для CORS"
     )
 

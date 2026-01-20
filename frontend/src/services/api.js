@@ -16,8 +16,8 @@
 
 // Базовый URL API
 // В development: запросы проксируются через Vite (см. vite.config.js)
-// В production: можно указать полный URL
-const API_BASE_URL = '/api';
+// В production: используем переменную окружения VITE_API_URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * Базовая функция для HTTP запросов.
