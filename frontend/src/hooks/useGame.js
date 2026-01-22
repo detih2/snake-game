@@ -40,7 +40,7 @@ export const GAME_STATUS = {
  * Генерирует секретную фразу с именем игрока.
  */
 export function getSecretPhrase(playerName) {
-  return `Для тебя, ${playerName || 'Player'}, лучший промокод от Яндекс путешествий, 20% скидки! Собери змейку и увидишь: PF-VIGODA-AH37X, конец!`;
+  return `${playerName || 'Player'}, лови -20% в Яндекс Путешествиях! Код: PF-VIGODA-AH37X`;
 }
 
 /**
