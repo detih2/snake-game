@@ -181,15 +181,15 @@ export function useGame() {
   
   /**
    * Изменить направление движения.
+   * Проверяем противоположное направление по значениям x и y.
    */
   const changeDirection = useCallback((newDirection) => {
     const current = directionRef.current;
     
+    // Проверяем противоположное направление по значениям (не по ссылке!)
     const isOpposite = (
-      (current === DIRECTIONS.UP && newDirection === DIRECTIONS.DOWN) ||
-      (current === DIRECTIONS.DOWN && newDirection === DIRECTIONS.UP) ||
-      (current === DIRECTIONS.LEFT && newDirection === DIRECTIONS.RIGHT) ||
-      (current === DIRECTIONS.RIGHT && newDirection === DIRECTIONS.LEFT)
+      current.x + newDirection.x === 0 && 
+      current.y + newDirection.y === 0
     );
     
     if (!isOpposite) {

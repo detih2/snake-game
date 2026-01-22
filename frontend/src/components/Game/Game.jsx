@@ -114,10 +114,17 @@ function Game({
               ? SECRET_PHRASE[letterIndex] 
               : null;
             
+            // Определяем классы сегмента
+            const segmentClasses = [
+              styles.snakeSegment,
+              isHead ? styles.snakeHead : '',
+              letter ? styles.snakeWithLetter : '',
+            ].filter(Boolean).join(' ');
+            
             return (
               <motion.div
                 key={`snake-${index}`}
-                className={`${styles.snakeSegment} ${isHead ? styles.snakeHead : ''}`}
+                className={segmentClasses}
                 style={{
                   gridColumn: segment.x + 1,
                   gridRow: segment.y + 1,

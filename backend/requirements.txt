@@ -3,26 +3,24 @@
 # =============================================================================
 
 # FastAPI — современный веб-фреймворк для создания API
-# Почему FastAPI: быстрый, с автодокументацией, type hints из коробки
 fastapi==0.109.2
 
 # Uvicorn — ASGI сервер для запуска FastAPI
-# Это как "движок" который запускает наше приложение
 uvicorn[standard]==0.27.1
 
 # SQLAlchemy — ORM для работы с базой данных
-# ORM = Object-Relational Mapping — позволяет работать с БД через Python объекты
 sqlalchemy==2.0.25
 
 # Pydantic Settings — конфигурация через переменные окружения
-# Валидирует настройки при старте приложения
 pydantic-settings==2.1.0
 
 # Python-dotenv — загрузка .env файла
 python-dotenv==1.0.1
 
-# Aiosqlite — асинхронный драйвер для SQLite
-# Позволяет не блокировать приложение при работе с БД
+# Asyncpg — асинхронный драйвер для PostgreSQL (production)
+asyncpg==0.29.0
+
+# Aiosqlite — асинхронный драйвер для SQLite (локальная разработка)
 aiosqlite==0.19.0
 
 # Greenlet — нужен для асинхронной работы SQLAlchemy
