@@ -33,7 +33,15 @@ export const GAME_STATUS = {
   PLAYING: 'playing',
   PAUSED: 'paused',
   GAME_OVER: 'gameOver',
+  VICTORY: 'victory',
 };
+
+/**
+ * Генерирует секретную фразу с именем игрока.
+ */
+export function getSecretPhrase(playerName) {
+  return `Для тебя, ${playerName || 'Player'}, лучший промокод от Яндекс путешествий, 20% скидки! Собери змейку и увидишь: PF-VIGODA-AH37X, конец!`;
+}
 
 /**
  * Генерирует случайную позицию на поле.
@@ -71,8 +79,12 @@ function createInitialSnake() {
 
 /**
  * Главный хук игры.
+ * @param {string} playerName - Имя игрока для секретной фразы
  */
-export function useGame() {
+export function useGame(playerName = 'Player') {
+  // Вычисляем секретную фразу и её длину
+  const secretPhrase = getSecretPhrase(playerName);
+  const phraseLength = secretPhrase.length;
   // === Состояние игры ===
   const [status, setStatus] = useState(GAME_STATUS.IDLE);
   const [snake, setSnake] = useState(createInitialSnake);
@@ -97,9 +109,15 @@ export function useGame() {
   const gameLoopRef = useRef(null);
   const bonusTimerRef = useRef(null);
   const growthRef = useRef(0);
+  const phraseLengthRef = useRef(phraseLength);
   
   // Ref для актуальных значений food и bonus (чтобы избежать stale closure)
   const gameStateRef = useRef({ food: null, bonus: null });
+  
+  // Синхронизируем phraseLength при смене имени
+  useEffect(() => {
+    phraseLengthRef.current = phraseLength;
+  }, [phraseLength]);
   
   // Синхронизируем refs
   useEffect(() => {
@@ -279,11 +297,20 @@ export function useGame() {
       if (currentFood && newHead.x === currentFood.x && newHead.y === currentFood.y) {
         growthRef.current += 1;
         setScore(s => s + 1);
+        
+        const newMaxLength = Math.max(newSnake.length + growthRef.current, 3);
         setStats(st => ({
           ...st,
           foodEaten: st.foodEaten + 1,
-          maxLength: Math.max(st.maxLength, newSnake.length + growthRef.current),
+          maxLength: Math.max(st.maxLength, newMaxLength),
         }));
+        
+        // Проверяем победу: голова + все буквы фразы
+        const targetLength = phraseLengthRef.current + 1;
+        if (newMaxLength >= targetLength) {
+          setStatus(GAME_STATUS.VICTORY);
+          return newSnake;
+        }
         
         const currentBonus = gameStateRef.current.bonus;
         const newFood = getRandomPosition(newSnake, null, currentBonus);
@@ -304,16 +331,25 @@ export function useGame() {
         
         growthRef.current += points;
         setScore(s => s + points);
+        
+        const newMaxLength = Math.max(newSnake.length + growthRef.current, 3);
         setStats(st => ({
           ...st,
           bonusesEaten: st.bonusesEaten + 1,
-          maxLength: Math.max(st.maxLength, newSnake.length + growthRef.current),
+          maxLength: Math.max(st.maxLength, newMaxLength),
         }));
         
         // Удаляем бонус СРАЗУ
         clearBonusTimer();
         gameStateRef.current.bonus = null;
         setBonus(null);
+        
+        // Проверяем победу
+        const targetLength = phraseLengthRef.current + 1;
+        if (newMaxLength >= targetLength) {
+          setStatus(GAME_STATUS.VICTORY);
+          return newSnake;
+        }
       }
       
       return newSnake;
@@ -404,6 +440,7 @@ export function useGame() {
     gridSize: GRID_SIZE,
     stats,
     direction,
+    secretPhrase,
     startGame,
     togglePause,
     goToMenu,

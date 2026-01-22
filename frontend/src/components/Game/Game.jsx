@@ -15,9 +15,6 @@ import { GAME_STATUS, BONUS_PHASE } from '../../hooks/useGame';
 import MobileControls from '../MobileControls';
 import styles from './Game.module.css';
 
-// Секретная фраза, которая появляется на теле змейки
-const SECRET_PHRASE = "Тихомиров-гений, самый классный и любимый!";
-
 // Направления для мобильного управления
 const DIRECTIONS = {
   UP: { x: 0, y: -1 },
@@ -40,6 +37,7 @@ function Game({
   onPause,
   onChangeDirection,
   playerName,
+  secretPhrase,
 }) {
   const isPaused = status === GAME_STATUS.PAUSED;
   
@@ -110,8 +108,8 @@ function Game({
           {snake.map((segment, index) => {
             const isHead = index === 0;
             const letterIndex = index - 1;
-            const letter = !isHead && letterIndex < SECRET_PHRASE.length 
-              ? SECRET_PHRASE[letterIndex] 
+            const letter = !isHead && secretPhrase && letterIndex < secretPhrase.length 
+              ? secretPhrase[letterIndex] 
               : null;
             
             // Определяем классы сегмента

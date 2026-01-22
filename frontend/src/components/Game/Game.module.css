@@ -130,88 +130,23 @@
   box-shadow: 0 0 2px white;
 }
 
-/* Сегмент с буквой — контрастный фон */
+/* Сегмент с буквой — тёмный фон для контраста с белыми буквами */
 .snakeWithLetter {
-  animation: contrastBackground 3s linear infinite;
+  background: linear-gradient(135deg, #1a3320, #0d1f12);
 }
 
-/* Буквы в сегментах змейки — неоновая радуга */
+/* Буквы в сегментах змейки — белые с неоновым свечением */
 .snakeLetter {
   font-size: calc(var(--cell-size) * 0.55);
   font-weight: 800;
   line-height: 1;
-  
-  /* Анимация радужного перелива */
-  animation: neonRainbow 3s linear infinite;
+  color: #ffffff;
   
   /* Неоновое свечение */
   text-shadow: 
-    0 0 3px currentColor,
-    0 0 6px currentColor;
-}
-
-/* Радужная анимация для букв */
-@keyframes neonRainbow {
-  0% {
-    color: #00ffff;
-    text-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff;
-  }
-  14% {
-    color: #00ff00;
-    text-shadow: 0 0 4px #00ff00, 0 0 8px #00ff00;
-  }
-  28% {
-    color: #ffff00;
-    text-shadow: 0 0 4px #ffff00, 0 0 8px #ffff00;
-  }
-  42% {
-    color: #ff8000;
-    text-shadow: 0 0 4px #ff8000, 0 0 8px #ff8000;
-  }
-  57% {
-    color: #ff0080;
-    text-shadow: 0 0 4px #ff0080, 0 0 8px #ff0080;
-  }
-  71% {
-    color: #8000ff;
-    text-shadow: 0 0 4px #8000ff, 0 0 8px #8000ff;
-  }
-  85% {
-    color: #0080ff;
-    text-shadow: 0 0 4px #0080ff, 0 0 8px #0080ff;
-  }
-  100% {
-    color: #00ffff;
-    text-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff;
-  }
-}
-
-/* Контрастный фон — инвертированные цвета */
-@keyframes contrastBackground {
-  0% {
-    background: linear-gradient(135deg, #1a0a0a, #0a1a1a);
-  }
-  14% {
-    background: linear-gradient(135deg, #0a0a1a, #1a0a1a);
-  }
-  28% {
-    background: linear-gradient(135deg, #0a0a1a, #0a1a0a);
-  }
-  42% {
-    background: linear-gradient(135deg, #0a1a1a, #0a0a1a);
-  }
-  57% {
-    background: linear-gradient(135deg, #1a1a0a, #0a1a1a);
-  }
-  71% {
-    background: linear-gradient(135deg, #1a0a1a, #1a1a0a);
-  }
-  85% {
-    background: linear-gradient(135deg, #1a1a0a, #1a0a0a);
-  }
-  100% {
-    background: linear-gradient(135deg, #1a0a0a, #0a1a1a);
-  }
+    0 0 4px #ffffff,
+    0 0 8px #00ff88,
+    0 0 12px #00ff88;
 }
 
 /* === Еда === */

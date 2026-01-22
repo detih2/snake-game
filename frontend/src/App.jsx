@@ -43,7 +43,7 @@ function App() {
     return localStorage.getItem('snakePlayerName') || 'Player';
   });
   
-  // Хук игровой логики
+  // Хук игровой логики — передаём имя игрока для секретной фразы
   const {
     status,
     snake,
@@ -53,11 +53,12 @@ function App() {
     highScore,
     gridSize,
     stats,
+    secretPhrase,
     startGame,
     togglePause,
     goToMenu,
     changeDirection,
-  } = useGame();
+  } = useGame(playerName);
   
   // Хук таблицы лидеров
   const {
@@ -178,17 +179,21 @@ function App() {
             onPause={togglePause}
             onChangeDirection={changeDirection}
             playerName={playerName}
+            secretPhrase={secretPhrase}
           />
         )}
         
-        {/* Game Over */}
-        {status === GAME_STATUS.GAME_OVER && (
+        {/* Game Over или Victory */}
+        {(status === GAME_STATUS.GAME_OVER || status === GAME_STATUS.VICTORY) && (
           <GameOver
             key="gameover"
             score={score}
             highScore={highScore}
             stats={stats}
             playerName={playerName}
+            secretPhrase={secretPhrase}
+            revealedLength={snake.length - 1}
+            isVictory={status === GAME_STATUS.VICTORY}
             onPlayAgain={handlePlayAgain}
             onGoToMenu={handleGoToMenu}
             onSaveResult={handleSaveResult}

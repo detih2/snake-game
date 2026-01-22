@@ -1,20 +1,30 @@
 /**
- * Стили для экрана Game Over.
+ * Стили для экрана Game Over / Victory.
  */
 
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 40px;
-  max-width: 450px;
+  gap: 20px;
+  padding: 32px;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
   background: var(--bg-card);
   border: 2px solid var(--accent-danger);
   border-radius: var(--border-radius);
   box-shadow: 
     var(--shadow-lg),
     0 0 40px rgba(255, 71, 87, 0.2);
+}
+
+/* Победа — зелёная тема */
+.container:has(.victoryTitle) {
+  border-color: var(--accent-primary);
+  box-shadow: 
+    var(--shadow-lg),
+    0 0 40px rgba(0, 255, 136, 0.3);
 }
 
 /* === Заголовок === */
@@ -26,7 +36,7 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   color: var(--accent-danger);
   text-shadow: 
     0 0 10px var(--accent-danger),
@@ -34,9 +44,42 @@
   animation: shake 0.5s ease-in-out;
 }
 
+.victoryTitle {
+  color: var(--accent-primary);
+  text-shadow: 
+    0 0 10px var(--accent-primary),
+    0 0 20px var(--accent-primary),
+    0 0 30px var(--accent-primary);
+  animation: victoryGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes victoryGlow {
+  0% {
+    text-shadow: 
+      0 0 10px var(--accent-primary),
+      0 0 20px var(--accent-primary);
+  }
+  100% {
+    text-shadow: 
+      0 0 20px var(--accent-primary),
+      0 0 40px var(--accent-primary),
+      0 0 60px #fbbf24;
+  }
+}
+
 .skull {
-  font-size: 3rem;
+  font-size: 2.5rem;
   animation: float 2s ease-in-out infinite;
+}
+
+.trophy {
+  font-size: 3rem;
+  animation: bounce 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-8px) scale(1.1); }
 }
 
 /* === Счёт === */
@@ -44,15 +87,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 20px 40px;
+  gap: 6px;
+  padding: 16px 32px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
 }
 
 .scoreLabel {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -60,7 +103,7 @@
 
 .scoreValue {
   font-family: var(--font-display);
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: 900;
   color: var(--text-primary);
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
@@ -68,57 +111,99 @@
 
 .newRecord {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--food-bonus);
   text-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
   animation: pulse 1s ease-in-out infinite;
 }
 
+/* === Открытая часть надписи === */
+.revealedPhrase {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(251, 191, 36, 0.1));
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.phraseTitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.phraseBox {
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.phraseText {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.phraseHidden {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.phraseHint {
+  margin-top: 10px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
 /* === Статистика === */
 .stats {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
 }
 
 .statsTitle {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: center;
 }
 
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .statItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .statIcon {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .statValue {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .statLabel {
-  font-size: 0.625rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   text-transform: uppercase;
 }
@@ -127,7 +212,7 @@
 .buttons {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -136,8 +221,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 28px;
-  font-size: 1.1rem;
+  padding: 12px 24px;
+  font-size: 1rem;
   background: linear-gradient(135deg, var(--accent-primary), #00cc6f);
   border: none;
   color: var(--bg-primary);
@@ -150,9 +235,9 @@
 
 /* === Статус сохранения === */
 .saveStatus {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
-  min-height: 20px;
+  min-height: 18px;
 }
 
 .saved {
@@ -161,26 +246,48 @@
 
 /* === Подсказка === */
 .hint {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
+}
+
+/* === Анимации === */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
 }
 
 /* === Адаптивность === */
 @media (max-width: 480px) {
   .container {
-    padding: 24px;
-    gap: 20px;
+    padding: 20px;
+    gap: 16px;
+    max-height: 85vh;
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .scoreValue {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
   
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .phraseText {
+    font-size: 0.9rem;
   }
 }

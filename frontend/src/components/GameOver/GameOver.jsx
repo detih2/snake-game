@@ -1,5 +1,5 @@
 /**
- * GameOver — компонент экрана окончания игры.
+ * GameOver — компонент экрана окончания игры или победы.
  */
 
 import { useEffect, useState, useRef } from 'react';
@@ -16,12 +16,16 @@ function formatTime(seconds) {
 }
 
 /**
- * Компонент экрана Game Over.
+ * Компонент экрана Game Over / Victory.
  */
 function GameOver({ 
   score, 
   highScore, 
   stats, 
+  playerName,
+  secretPhrase,
+  revealedLength,
+  isVictory,
   onPlayAgain, 
   onGoToMenu,
   onSaveResult,
@@ -30,7 +34,7 @@ function GameOver({
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   
-  // Ref чтобы предотвратить повторное сохранение (StrictMode вызывает useEffect дважды)
+  // Ref чтобы предотвратить повторное сохранение (StrictMode)
   const saveAttemptedRef = useRef(false);
   
   // Вычисляем длительность игры ОДИН раз при монтировании
@@ -38,6 +42,11 @@ function GameOver({
     stats.startTime ? (Date.now() - stats.startTime) / 1000 : 0
   );
   const duration = durationRef.current;
+  
+  // Открытая часть секретной фразы
+  const revealedText = secretPhrase 
+    ? secretPhrase.slice(0, Math.min(revealedLength, secretPhrase.length))
+    : '';
   
   // Проверяем новый рекорд
   useEffect(() => {
@@ -49,7 +58,6 @@ function GameOver({
   // Сохраняем результат при монтировании (только один раз!)
   useEffect(() => {
     const saveResult = async () => {
-      // Проверяем что ещё не пытались сохранить
       if (saveAttemptedRef.current) return;
       saveAttemptedRef.current = true;
       
@@ -81,15 +89,24 @@ function GameOver({
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Заголовок */}
+      {/* Заголовок — Victory или Game Over */}
       <motion.div 
         className={styles.header}
         initial={{ y: -50 }}
         animate={{ y: 0 }}
         transition={{ delay: 0.1, type: 'spring' }}
       >
-        <h1 className={styles.title}>GAME OVER</h1>
-        <span className={styles.skull}>💀</span>
+        {isVictory ? (
+          <>
+            <h1 className={`${styles.title} ${styles.victoryTitle}`}>ПОБЕДА!</h1>
+            <span className={styles.trophy}>🏆</span>
+          </>
+        ) : (
+          <>
+            <h1 className={styles.title}>GAME OVER</h1>
+            <span className={styles.skull}>💀</span>
+          </>
+        )}
       </motion.div>
       
       {/* Счёт */}
@@ -123,12 +140,35 @@ function GameOver({
         )}
       </motion.div>
       
+      {/* Открытая часть надписи */}
+      <motion.div 
+        className={styles.revealedPhrase}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <h3 className={styles.phraseTitle}>
+          {isVictory ? '🎉 Ты собрал секретное послание:' : '📝 Открытая часть послания:'}
+        </h3>
+        <div className={styles.phraseBox}>
+          <span className={styles.phraseText}>{revealedText}</span>
+          {!isVictory && revealedText.length < secretPhrase.length && (
+            <span className={styles.phraseHidden}>...</span>
+          )}
+        </div>
+        {!isVictory && (
+          <p className={styles.phraseHint}>
+            Собери змейку длиной {secretPhrase.length + 1} чтобы увидеть всё!
+          </p>
+        )}
+      </motion.div>
+      
       {/* Статистика */}
       <motion.div 
         className={styles.stats}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.4 }}
       >
         <h3 className={styles.statsTitle}>Статистика игры</h3>
         <div className={styles.statsGrid}>
@@ -160,7 +200,7 @@ function GameOver({
         className={styles.buttons}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.5 }}
       >
         <motion.button
           className={styles.playAgainButton}
@@ -186,7 +226,7 @@ function GameOver({
         className={styles.saveStatus}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.6 }}
       >
         {isSaving && <span>💾 Сохранение результата...</span>}
         {saved && <span className={styles.saved}>✅ Результат сохранён</span>}
@@ -197,7 +237,7 @@ function GameOver({
         className={styles.hint}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.5 }}
-        transition={{ delay: 0.6 }}
+        transition={{ delay: 0.7 }}
       >
         Нажмите Enter для новой игры
       </motion.p>
