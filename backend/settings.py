@@ -75,9 +75,17 @@ class Settings(BaseSettings):
             "http://127.0.0.1:5173",
             "http://localhost:3000",
             "https://dist-lime-mu.vercel.app",
-            "https://*.vercel.app",
+            "https://frontend-drab-ten-89.vercel.app",
+            "https://snakepromo.ru",
+            "https://www.snakepromo.ru",
         ],
         description="Разрешённые origins для CORS"
+    )
+    
+    # Разрешить все origins для Vercel preview deployments
+    cors_allow_all_vercel: bool = Field(
+        default=True,
+        description="Разрешить все *.vercel.app origins"
     )
 
 

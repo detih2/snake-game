@@ -1,0 +1,69 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0a0f"/>
+  
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1a1a2e" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.5"/>
+  
+  <!-- Glow effect -->
+  <ellipse cx="600" cy="315" rx="400" ry="200" fill="#00ff88" opacity="0.05"/>
+  
+  <!-- Snake segments with letters -->
+  <g transform="translate(300, 280)">
+    <!-- P -->
+    <rect x="0" y="0" width="60" height="60" rx="10" fill="url(#snakeGradient)"/>
+    <text x="30" y="42" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#0a0a0f" text-anchor="middle">P</text>
+    
+    <!-- R -->
+    <rect x="70" y="0" width="60" height="60" rx="10" fill="url(#snakeGradient)"/>
+    <text x="100" y="42" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#0a0a0f" text-anchor="middle">R</text>
+    
+    <!-- O -->
+    <rect x="140" y="0" width="60" height="60" rx="10" fill="url(#snakeGradient)"/>
+    <text x="170" y="42" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#0a0a0f" text-anchor="middle">O</text>
+    
+    <!-- M -->
+    <rect x="210" y="0" width="60" height="60" rx="10" fill="url(#snakeGradient)"/>
+    <text x="240" y="42" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#0a0a0f" text-anchor="middle">M</text>
+    
+    <!-- O -->
+    <rect x="280" y="0" width="60" height="60" rx="10" fill="url(#snakeGradient)"/>
+    <text x="310" y="42" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#0a0a0f" text-anchor="middle">O</text>
+    
+    <!-- Head -->
+    <rect x="350" y="0" width="60" height="60" rx="10" fill="url(#snakeGradient)"/>
+    <circle cx="365" cy="25" r="6" fill="#0a0a0f"/>
+    <circle cx="395" cy="25" r="6" fill="#0a0a0f"/>
+    
+    <!-- Food -->
+    <circle cx="480" cy="30" r="20" fill="#ef4444"/>
+  </g>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88"/>
+      <stop offset="100%" style="stop-color:#16a34a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Title -->
+  <text x="600" y="180" font-family="Inter, sans-serif" font-size="48" font-weight="800" fill="#ffffff" text-anchor="middle">Snake Promo</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="230" font-family="Inter, sans-serif" font-size="24" fill="#9ca3af" text-anchor="middle">Промокоды, которые хочется получить</text>
+  
+  <!-- Stats -->
+  <text x="600" y="450" font-family="Inter, sans-serif" font-size="20" fill="#00ff88" text-anchor="middle">Конверсия x3-5 выше обычных промокодов</text>
+  
+  <!-- URL -->
+  <text x="600" y="550" font-family="Inter, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">snakepromo.ru</text>
+  
+  <!-- Snake emoji -->
+  <text x="60" y="80" font-size="48">🐍</text>
+</svg>

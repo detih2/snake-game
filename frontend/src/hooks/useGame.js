@@ -11,7 +11,7 @@ const MIN_SPEED = 50;
 const SPEED_INCREMENT = 5;
 const BONUS_SOLID_DURATION = 5000;    // Фаза 1: 5 сек (5 очков)
 const BONUS_BLINKING_DURATION = 5000; // Фаза 2: 5 сек (3 очка)
-const BONUS_CHANCE = 0.15;
+const BONUS_SPAWN_INTERVAL = 2;       // Бонус появляется каждые N съеденной еды
 
 // Фазы бонуса
 export const BONUS_PHASE = {
@@ -110,6 +110,7 @@ export function useGame(playerName = 'Player') {
   const bonusTimerRef = useRef(null);
   const growthRef = useRef(0);
   const phraseLengthRef = useRef(phraseLength);
+  const foodEatenCountRef = useRef(0); // Счётчик съеденной обычной еды для спавна бонусов
   
   // Ref для актуальных значений food и bonus (чтобы избежать stale closure)
   const gameStateRef = useRef({ food: null, bonus: null });
@@ -164,6 +165,7 @@ export function useGame(playerName = 'Player') {
     directionRef.current = DIRECTIONS.RIGHT;
     gameStateRef.current = { food: newFood, bonus: null };
     growthRef.current = 0;
+    foodEatenCountRef.current = 0; // Сбрасываем счётчик еды при старте
     setScore(0);
     setStats({
       foodEaten: 0,
@@ -298,6 +300,9 @@ export function useGame(playerName = 'Player') {
         growthRef.current += 1;
         setScore(s => s + 1);
         
+        // Увеличиваем счётчик съеденной еды
+        foodEatenCountRef.current += 1;
+        
         const newMaxLength = Math.max(newSnake.length + growthRef.current, 3);
         setStats(st => ({
           ...st,
@@ -317,8 +322,8 @@ export function useGame(playerName = 'Player') {
         gameStateRef.current.food = newFood;
         setFood(newFood);
         
-        // Шанс спавна бонуса
-        if (Math.random() < BONUS_CHANCE && !currentBonus) {
+        // Спавним бонус каждые BONUS_SPAWN_INTERVAL съеденной еды
+        if (foodEatenCountRef.current % BONUS_SPAWN_INTERVAL === 0 && !currentBonus) {
           spawnBonus(newSnake, newFood);
         }
       }

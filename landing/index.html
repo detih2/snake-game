@@ -10,14 +10,33 @@
     <meta property="og:description" content="Геймифицируйте скидки. Конверсия x3-5 выше обычных промокодов.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://snakepromo.ru">
-    <meta property="og:image" content="https://snakepromo.ru/og-image.png">
+    <meta property="og:image" content="https://snakepromo.ru/og-image.svg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Snake Promo — Промокоды, которые хочется получить">
     <meta name="twitter:description" content="Геймифицируйте скидки. Конверсия x3-5 выше обычных промокодов.">
+    <meta name="twitter:image" content="https://snakepromo.ru/og-image.svg">
     
     <title>Snake Promo — Промокоды, которые хочется получить</title>
+    
+    <!-- Яндекс.Метрика -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+        ym(106442401, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/106442401" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     
     <!-- Preconnect для Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -225,6 +244,7 @@
                             <span class="plan__amount">15 000</span>
                             <span class="plan__currency">₽/мес</span>
                         </div>
+                        <p class="plan__note">при оплате за год</p>
                     </div>
                     <ul class="plan__features">
                         <li>Безлимит кампаний</li>
@@ -246,28 +266,18 @@
             <p class="section-subtitle">Оставьте заявку — свяжемся в течение 2 часов</p>
             
             <div class="form-wrapper">
-                <!-- Placeholder для Tally формы -->
-                <div id="tally-form" class="tally-placeholder">
-                    <div class="tally-placeholder__content">
-                        <span class="tally-placeholder__icon">📝</span>
-                        <p class="tally-placeholder__text">Форма загружается...</p>
-                        <p class="tally-placeholder__hint">Или напишите нам в Telegram: <a href="https://t.me/snake_promo" target="_blank" rel="noopener">@snake_promo</a></p>
-                    </div>
-                </div>
-                <!-- 
-                    Для подключения Tally формы замените div выше на:
-                    <iframe 
-                        data-tally-src="https://tally.so/embed/FORM_ID?alignLeft=1&hideTitle=1&transparentBackground=1"
-                        loading="lazy"
-                        width="100%"
-                        height="400"
-                        frameborder="0"
-                        marginheight="0"
-                        marginwidth="0"
-                        title="Заявка Snake Promo"
-                    ></iframe>
-                    <script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if(d.querySelector('script[src="'+w+'"]'))v();else{var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s)}</script>
-                -->
+                <iframe 
+                    data-tally-src="https://tally.so/embed/7RNpYA?alignLeft=1&hideTitle=1&transparentBackground=1"
+                    loading="lazy"
+                    width="100%"
+                    height="500"
+                    frameborder="0"
+                    marginheight="0"
+                    marginwidth="0"
+                    title="Заявка Snake Promo"
+                ></iframe>
+                <script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if(d.querySelector('script[src="'+w+'"]'))v();else{var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s)}</script>
+                <p class="form-consent">Отправляя заявку, вы соглашаетесь на обработку <a href="/privacy.html" target="_blank">персональных данных</a> в соответствии с 152-ФЗ</p>
             </div>
         </div>
     </section>
@@ -291,9 +301,25 @@
             </div>
             <div class="footer__bottom">
                 <p>© 2026 Snake Promo. Геймифицируем ваши промокоды.</p>
+                <a href="/privacy.html" class="footer__privacy">Политика конфиденциальности</a>
             </div>
         </div>
     </footer>
+
+    <!-- Cookie Banner -->
+    <div id="cookie-banner" class="cookie-banner" style="display: none;">
+        <div class="cookie-banner__content">
+            <p>🍪 Мы используем cookies для улучшения работы сайта. Продолжая использовать сайт, вы соглашаетесь с <a href="/privacy.html">политикой конфиденциальности</a>.</p>
+            <button id="cookie-accept" class="cookie-banner__btn">Принять</button>
+        </div>
+    </div>
+
+    <!-- Telegram Widget -->
+    <a href="https://t.me/snake_promo" target="_blank" rel="noopener" class="telegram-widget" title="Написать в Telegram">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+    </a>
 
     <!-- Плавная прокрутка к якорям -->
     <script>
@@ -309,6 +335,21 @@
                 }
             });
         });
+
+        // Cookie Banner
+        (function() {
+            const banner = document.getElementById('cookie-banner');
+            const acceptBtn = document.getElementById('cookie-accept');
+            
+            if (!localStorage.getItem('cookiesAccepted')) {
+                banner.style.display = 'flex';
+            }
+            
+            acceptBtn.addEventListener('click', function() {
+                localStorage.setItem('cookiesAccepted', 'true');
+                banner.style.display = 'none';
+            });
+        })();
     </script>
 </body>
 </html>

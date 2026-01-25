@@ -97,9 +97,11 @@ app = FastAPI(
 #
 # Решение:
 # Явно разрешаем определённые origins обращаться к нашему API
+# Используем allow_origin_regex для поддержки Vercel preview deployments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,  # Откуда разрешены запросы
+    allow_origin_regex=r"https://.*\.vercel\.app" if settings.cors_allow_all_vercel else None,
     allow_credentials=True,               # Разрешить отправку cookies
     allow_methods=["*"],                  # Разрешить все HTTP методы (GET, POST, etc.)
     allow_headers=["*"],                  # Разрешить все заголовки
